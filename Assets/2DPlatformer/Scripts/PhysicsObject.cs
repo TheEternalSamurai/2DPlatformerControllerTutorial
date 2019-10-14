@@ -7,6 +7,7 @@ public class PhysicsObject : MonoBehaviour
     public float minGroundNormalY = 0.65f;
     public float gravityModifier = 1f;
 
+    protected Vector2 targetVelocity;
     protected bool isGrounded;
     protected Vector2 groundNormal;
     protected Rigidbody2D rigBody2d;
@@ -23,7 +24,6 @@ public class PhysicsObject : MonoBehaviour
         rigBody2d = GetComponent<Rigidbody2D>();
     }
 
-    // Start is called before the first frame update
     void Start()
     {
         contactFilter.useTriggers = false;
@@ -31,20 +31,22 @@ public class PhysicsObject : MonoBehaviour
         contactFilter.useLayerMask = true;
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
     private void FixedUpdate()
     {
         velocity += gravityModifier * Physics2D.gravity * Time.deltaTime;
+        velocity.x = targetVelocity.x;
 
         isGrounded = false;
 
         Vector2 deltaPos = velocity * Time.deltaTime;
-        Vector2 move = Vector2.up * deltaPos.y;
+
+        Vector2 moveAlongGround = new Vector2(groundNormal.y, -groundNormal.x);
+
+        Vector2 move = moveAlongGround * deltaPos.x;
+
+        Movement(move, false);
+
+        move = Vector2.up * deltaPos.y;
 
         Movement(move, true);
     }
